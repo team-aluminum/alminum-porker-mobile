@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Button,
   StatusBar,
+  Linking,
 } from 'react-native';
 import BaseScreen from '../base';
 
@@ -18,6 +19,20 @@ class Home extends BaseScreen {
   };
   onPressCardScanner = () => {
     this.props.navigation.navigate('CardScanner');
+  };
+
+  componentDidMount() {
+    Linking.addEventListener('url', this.handleOpenURL);
+  }
+
+  componentWillUnmount() {
+    Linking.removeEventListener('url', this.handleOpenURL);
+  }
+
+  handleOpenURL = (event: {url: string}) => {
+    console.log(event.url);
+    const route = event.url.replace(/.*?:\/\//g, '');
+    console.log(route);
   };
 
   render(): ReactElement {

@@ -52,7 +52,7 @@ class GameEnter extends PureComponent {
       <View style={styles.container}>
         <RNCamera
           style={styles.preview}
-          type={RNCamera.Constants.Type.back}
+          type={RNCamera.Constants.Type.front}
           captureAudio={false}
           barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
           androidCameraPermissionOptions={{
