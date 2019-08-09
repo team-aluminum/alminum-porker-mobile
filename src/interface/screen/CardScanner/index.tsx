@@ -31,9 +31,8 @@ class GameEnter extends PureComponent {
     this.setState({isReady: false});
 
     const readText = res.data;
-    const cardIds: string[] = ['s1'];
 
-    if (!readText || cardIds.indexOf(readText)) {
+    if (!readText || !readText.match('^[cdhs][1-9][0-3]?$')) {
       this.setState({isReady: true});
       return;
     }
@@ -69,11 +68,23 @@ class GameEnter extends PureComponent {
           }}
           onBarCodeRead={this.onBarCodeRead}
         >
-          {({ status, recordAudioPermissionStatus }) => {
+          {({ status }) => {
             if (status !== 'READY') return <PendingView/>;
-            console.log(recordAudioPermissionStatus);
             return (
-              <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
+              <View style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                flex: 0,
+                borderRadius: 5,
+                padding: 15,
+                paddingHorizontal: 70,
+                alignSelf: 'center',
+                width: '100%',
+                height: '100%',
+                // backgroundColor: '#ff000099',
+              }}>
+
               </View>
             );
           }}
