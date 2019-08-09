@@ -20,6 +20,7 @@ import BaseScreen from '../base';
 import UrlParse from 'url-parse';
 import { NavigationScreenProps } from "react-navigation";
 import { FlatButton } from '../../../util/ui/component/FlatButton';
+import GameApi from "../../../infrastructure/network/GameApi";
 
 class Home extends BaseScreen {
 
@@ -70,6 +71,13 @@ class Home extends BaseScreen {
       userCode: url.query.userCode,
       hosting: !!url.query.hosting,
     })
+
+    const api = new GameApi(this.state.userCode);
+    api.sendMobileUser().catch(() => {
+      Alert.alert('ゲームに参加', 'ユーザー情報の送信に失敗しました', [
+        {text: 'OK'},
+      ]);
+    });
   };
 
   render(): ReactElement {

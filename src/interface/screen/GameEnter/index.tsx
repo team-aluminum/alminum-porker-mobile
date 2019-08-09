@@ -51,10 +51,30 @@ class GameEnter extends BaseScreen {
         }
         this.readCount += 1;
         Alert.alert('OK', '2枚目のカードを読み取ってください', [
-          { text: 'OK', onPress: () => this.setState({isQrReady: true})}
+          {text: 'OK', onPress: () => this.setState({isQrReady: true})},
         ]);
       })
-      .catch();
+      .catch(() => {
+        Alert.alert('エラー', '通信に失敗しました', [
+          {text: 'OK', onPress: () => this.setState({isQrReady: true})},
+        ]);
+
+        if (this.readCount === 1) {
+          Alert.alert('エラー', '通信に失敗しました', [
+            {
+              text: 'OK', onPress: () => {
+                this.setState({isQrReady: true});
+                this.props.navigation.navigate('Home', {
+                  status: 'start',
+                });
+              },
+            },
+          ]);
+
+          return;
+        }
+
+      });
   };
 
   render() {
@@ -79,7 +99,7 @@ class GameEnter extends BaseScreen {
           }}
           onBarCodeRead={this.onBarCodeRead}
         >
-          {({ status }) => {
+          {({status}) => {
             if (status !== 'READY') return <PendingView/>;
             return (
               <SafeAreaView style={{
@@ -92,7 +112,7 @@ class GameEnter extends BaseScreen {
                 alignSelf: 'center',
                 width: '100%',
                 height: '100%',
-              }} >
+              }}>
                 <View style={{
                   backgroundColor: '#00000099',
                   marginTop: 40,
