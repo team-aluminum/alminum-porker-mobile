@@ -2,17 +2,18 @@ import React, { PureComponent } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { IRNCameraOnBarCodeReadResponse } from '../../../types/rnCamera';
+import GameApi from "../../../infrastructure/network/GameApi";
 
 const PendingView = () => (
   <View
     style={{
       flex: 1,
-      backgroundColor: 'lightgreen',
+      backgroundColor: 'black',
       justifyContent: 'center',
       alignItems: 'center',
     }}
   >
-    <Text>Waiting</Text>
+    <Text style={{color: 'white'}}>Waiting</Text>
   </View>
 );
 
@@ -22,13 +23,25 @@ class GameEnter extends PureComponent {
     isRecording: false,
   };
 
-  onBarCodeRead = (data: IRNCameraOnBarCodeReadResponse) => {
+  onBarCodeRead = (res: IRNCameraOnBarCodeReadResponse) => {
     if (!this.state.isReady) {
       return;
     }
 
     this.setState({isReady: false});
-    Alert.alert('QR data', data.data, [
+
+    const readText = res.data;
+    const cardIds: string[] = ['s1'];
+
+    if (!readText || cardIds.indexOf(readText)) {
+      this.setState({isReady: true});
+      return;
+    }
+
+    const gameApi = new GameApi('__EnterPlayerId__');
+    gameApi.sendTakeCard(readText);
+
+    Alert.alert('QR data', readText, [
       { text: 'OK', onPress: () => this.setState({isReady: true}) },
     ]);
   };
