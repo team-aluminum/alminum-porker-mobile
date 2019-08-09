@@ -1,24 +1,49 @@
 import ApiClient from "../../../util/ApiClient";
 
-const gameApiEndpoint: string = 'http://localhost';
+const gameApiEndpoint: string = 'https://aluminum-poker.herokuapp.com';
 
 export default class GameApi {
-  playerId: string;
+  userCode: string;
+  api: ApiClient;
 
-  constructor(playerId: string) {
-    this.playerId = playerId;
+  constructor(userCode: string) {
+    this.userCode = userCode;
+    this.api = new ApiClient(gameApiEndpoint);
   }
 
-  sendTakeCard(cardId: string) {
-    const api = new ApiClient(gameApiEndpoint);
-    api.post('post', {params: {
-        cardId,
-      }})
-      .then((resp): void => {
-        console.log(resp);
-      })
-      .catch((err): void => {
-        console.log(err);
-      })
+  sendMobileUser() {
+    return this.api.post('/mobile_events/mobile_user', {
+      params: {
+        user_code: this.userCode,
+      },
+    });
   }
+
+  sendReadCard(card: string) {
+    return this.api.post('/mobile_events/mobile_user', {
+      params: {
+        user_code: this.userCode,
+        card,
+      },
+    });
+  }
+
+  getStatus() {
+    return this.api.get('/mobile_events/mobile_user', {
+      params: {
+        user_code: this.userCode,
+      },
+    });
+  }
+
+  sendAction(type: string, amount?: number) {
+    return this.api.post('/mobile_events/action', {
+      params: {
+        user_code: this.userCode,
+        type,
+        amount,
+      },
+    });
+  }
+
 }

@@ -28,14 +28,19 @@ class Home extends BaseScreen {
     this.state = {
       userCode: '',
       hosting: false,
+      isQrReady: false,
     };
   }
 
   onPressGameEnter = (): void => {
-    this.props.navigation.navigate('GameEnter');
+    this.props.navigation.navigate('GameEnter', {
+      userCode: this.state.userCode,
+    });
   };
   onPressCardScanner = (): void => {
-    this.props.navigation.navigate('CardScanner');
+    this.props.navigation.navigate('CardScanner', {
+      userCode: this.state.userCode,
+    });
   };
 
   componentDidMount(): void {
@@ -76,6 +81,9 @@ class Home extends BaseScreen {
               <FlatButton text={'JOIN GAME'} onPress={this.onPressGameEnter} />
             </View>
             <Button title={'トランプをスキャンする'} onPress={this.onPressCardScanner}/>
+
+            <Text>ゲームが開始されるまで{'\n'}お待ちください</Text>
+
             <Text>UserCode: {this.state.userCode ? this.state.userCode : '未設定'}</Text>
             <Text>hosting: {this.state.hosting ? 'Yes' : 'No'}</Text>
           </SafeAreaView>

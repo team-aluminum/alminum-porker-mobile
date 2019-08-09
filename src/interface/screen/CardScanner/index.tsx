@@ -38,7 +38,7 @@ class GameEnter extends PureComponent {
     }
 
     const gameApi = new GameApi('__EnterPlayerId__');
-    gameApi.sendTakeCard(readText);
+    gameApi.sendReadCard(readText);
 
     Alert.alert('QR data', readText, [
       { text: 'OK', onPress: () => this.setState({isReady: true}) },

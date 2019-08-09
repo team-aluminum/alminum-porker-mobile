@@ -8,8 +8,11 @@ interface BaseProps {
 interface State {
   userCode: string,
   hosting: boolean,
+  isQrReady: boolean,
 }
 
-class BaseScreen extends Component<BaseProps, State> {}
+class BaseScreen extends Component<BaseProps, State> {
+
+}
 
 export default BaseScreen;

@@ -1,7 +1,10 @@
-import React, { PureComponent } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { Alert, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { IRNCameraOnBarCodeReadResponse } from "../../../types/rnCamera";
+import GameApi from "../../../infrastructure/network/GameApi";
+import BaseScreen from "../base";
+import { NavigationScreenProps } from "react-navigation";
 
 const PendingView = () => (
   <View
@@ -16,21 +19,41 @@ const PendingView = () => (
   </View>
 );
 
-class GameEnter extends PureComponent {
-  state = {
-    isReady: true,
-    isRecording: false,
-  };
+class GameEnter extends BaseScreen {
+  readCount = 0;
+
+  constructor(props: NavigationScreenProps) {
+    super(props);
+    this.state = {
+      userCode: this.props.navigation.getParam('userCode', ''),
+      hosting: false,
+      isQrReady: true,
+    };
+  }
 
   onBarCodeRead = (data: IRNCameraOnBarCodeReadResponse) => {
-    if (!this.state.isReady) {
+    if (!this.state.isQrReady) {
       return;
     }
 
-    this.setState({isReady: false});
-    Alert.alert('QR data', data.data, [
-      { text: 'OK', onPress: () => this.setState({isReady: true}) },
-    ]);
+    const readText = data.data;
+
+    this.setState({isQrReady: false});
+
+    const gameApi = new GameApi(this.state.userCode);
+    gameApi.sendReadCard(readText)
+      .then(() => {
+        if (this.readCount === 1) {
+          this.props.navigation.navigate('Home', {
+          });
+          return;
+        }
+        this.readCount += 1;
+        Alert.alert('OK', '2枚目のカードを読み取ってください', [
+          { text: 'OK', onPress: () => this.setState({isQrReady: true})}
+        ]);
+      })
+      .catch();
   };
 
   render() {
@@ -55,9 +78,36 @@ class GameEnter extends PureComponent {
           }}
           onBarCodeRead={this.onBarCodeRead}
         >
-          {({ status, recordAudioPermissionStatus }) => {
+          {({ status }) => {
             if (status !== 'READY') return <PendingView/>;
-            console.log(recordAudioPermissionStatus);
+            return (
+              <SafeAreaView style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                flex: 0,
+                borderRadius: 5,
+                paddingHorizontal: 70,
+                alignSelf: 'center',
+                width: '100%',
+                height: '100%',
+              }} >
+                <View style={{
+                  backgroundColor: '#00000099',
+                  marginTop: 40,
+                  paddingVertical: 32,
+                  paddingHorizontal: 16,
+                  width: '100%',
+                  justifyContent: 'center',
+                }}>
+                  <Text style={styles.overlayTitle}>カードパターンを読み込んで ゲームに参加します</Text>
+                  <Text style={styles.overlayDesctiption}>
+                    {this.readCount === 0 ? '1枚目のカードを読み取ってください' : null}
+                    {this.readCount === 1 ? '2枚目のカードを読み取ってください' : null}
+                  </Text>
+                </View>
+              </SafeAreaView>
+            )
           }}
         </RNCamera>
       </View>
@@ -84,6 +134,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignSelf: 'center',
     margin: 20,
+  },
+  overlayTitle: {
+    color: '#fff',
+    fontSize: 18,
+  },
+  overlayDesctiption: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 
