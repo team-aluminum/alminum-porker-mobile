@@ -12,12 +12,17 @@ import {
   Text,
   Linking,
   Alert,
+  ImageBackground,
+  Image,
+  View,
 } from 'react-native';
 import BaseScreen from '../base';
 import UrlParse from 'url-parse';
 import { NavigationScreenProps } from "react-navigation";
+import { FlatButton } from '../../../util/ui/component/FlatButton';
 
 class Home extends BaseScreen {
+
   constructor(props: NavigationScreenProps) {
     super(props);
     this.state = {
@@ -26,28 +31,28 @@ class Home extends BaseScreen {
     };
   }
 
-  onPressGameEnter = () => {
+  onPressGameEnter = (): void => {
     this.props.navigation.navigate('GameEnter');
   };
-  onPressCardScanner = () => {
+  onPressCardScanner = (): void => {
     this.props.navigation.navigate('CardScanner');
   };
 
-  componentDidMount() {
+  componentDidMount(): void {
     Linking.addEventListener('url', this.handleOpenURL);
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     Linking.removeEventListener('url', this.handleOpenURL);
   }
 
-  handleOpenURL = (event: {url: string}) => {
+  handleOpenURL = (event: { url: string }): void => {
     console.log(event.url);
     const url = new UrlParse(event.url, true);
 
     if (!url.query.userCode) {
       Alert.alert('ゲームに参加', 'ユーザー情報の取得に失敗しました', [
-        { text: 'OK' },
+        {text: 'OK'},
       ]);
       return;
     }
@@ -62,12 +67,19 @@ class Home extends BaseScreen {
     return (
       <Fragment>
         <StatusBar barStyle="dark-content"/>
-        <SafeAreaView style={styles.SafeAreaView}>
-          <Button title={'ゲームに参加する'} onPress={this.onPressGameEnter}/>
-          <Button title={'トランプをスキャンする'} onPress={this.onPressCardScanner}/>
-          <Text>UserCode: {this.state.userCode ? this.state.userCode : '未設定'}</Text>
-          <Text>hosting: {this.state.hosting ? 'Yes' : 'No'}</Text>
-        </SafeAreaView>
+        <ImageBackground source={require('../../../assets/images/background.png')} style={styles.ImageBackground}>
+          <SafeAreaView style={styles.SafeAreaView}>
+            <View style={styles.LogoView}>
+              <Image style={styles.LogoImage} source={require('../../../assets/images/logo.png')} />
+            </View>
+            <View style={styles.MenuView}>
+              <FlatButton text={'JOIN GAME'} onPress={this.onPressGameEnter} />
+            </View>
+            <Button title={'トランプをスキャンする'} onPress={this.onPressCardScanner}/>
+            <Text>UserCode: {this.state.userCode ? this.state.userCode : '未設定'}</Text>
+            <Text>hosting: {this.state.hosting ? 'Yes' : 'No'}</Text>
+          </SafeAreaView>
+        </ImageBackground>
       </Fragment>
     );
   }
@@ -75,7 +87,27 @@ class Home extends BaseScreen {
 
 const styles = StyleSheet.create({
   SafeAreaView: {
-    paddingTop: 80,
+    flex: 1,
+  },
+  ImageBackground: {
+    width: '100%',
+    height: '100%',
+  },
+  LogoView: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    marginTop: 80,
+  },
+  LogoImage: {
+    width: 192,
+    height: 88,
+  },
+  MenuView: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    marginVertical: 40,
   },
 });
 

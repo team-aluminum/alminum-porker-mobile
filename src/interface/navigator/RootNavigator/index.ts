@@ -9,4 +9,5 @@ export default createStackNavigator({
   CardScanner: { screen: CardScanner },
 }, {
   mode: 'modal',
+  headerMode: "none",
 });
