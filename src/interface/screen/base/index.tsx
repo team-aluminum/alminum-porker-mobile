@@ -5,7 +5,10 @@ import { NavigationScreenProp } from "react-navigation";
 interface BaseProps {
   navigation: NavigationScreenProp<any, any>;
 }
-interface State {}
+interface State {
+  userCode: string,
+  hosting: boolean,
+}
 
 class BaseScreen extends Component<BaseProps, State> {}
 
