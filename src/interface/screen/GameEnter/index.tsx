@@ -45,6 +45,7 @@ class GameEnter extends BaseScreen {
       .then(() => {
         if (this.readCount === 1) {
           this.props.navigation.navigate('Home', {
+            status: 'start_waiting',
           });
           return;
         }

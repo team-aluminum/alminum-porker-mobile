@@ -32,6 +32,9 @@ class Home extends BaseScreen {
     };
   }
 
+  // start \ start_waiting
+  status = 'start';
+
   onPressGameEnter = (): void => {
     this.props.navigation.navigate('GameEnter', {
       userCode: this.state.userCode,
@@ -45,6 +48,7 @@ class Home extends BaseScreen {
 
   componentDidMount(): void {
     Linking.addEventListener('url', this.handleOpenURL);
+    this.status = this.props.navigation.getParam('status', 'start');
   }
 
   componentWillUnmount(): void {
@@ -77,12 +81,15 @@ class Home extends BaseScreen {
             <View style={styles.LogoView}>
               <Image style={styles.LogoImage} source={require('../../../assets/images/logo.png')} />
             </View>
-            <View style={styles.MenuView}>
-              <FlatButton text={'JOIN GAME'} onPress={this.onPressGameEnter} />
-            </View>
-            <Button title={'トランプをスキャンする'} onPress={this.onPressCardScanner}/>
+            {this.status === 'start' ?
+              <View style={styles.MenuView}>
+                <FlatButton text={'JOIN GAME'} onPress={this.onPressGameEnter} />
+              </View>
+              : null}
 
-            <Text>ゲームが開始されるまで{'\n'}お待ちください</Text>
+            <Button title={'トランプを読み取る'} onPress={this.onPressCardScanner}/>
+
+            {this.status === 'start_waiting' ? <Text>ゲームが開始されるまで{'\n'}お待ちください</Text> : null}
 
             <Text>UserCode: {this.state.userCode ? this.state.userCode : '未設定'}</Text>
             <Text>hosting: {this.state.hosting ? 'Yes' : 'No'}</Text>
