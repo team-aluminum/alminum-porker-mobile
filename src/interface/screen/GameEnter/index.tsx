@@ -49,16 +49,17 @@ class GameEnter extends BaseScreen {
           Alert.alert('OK', '2枚目のカードを読み取ってください', [
             {text: 'OK', onPress: () => this.setState({isQrReady: true})},
           ]);
-        }
-        else if (this.readCount === 1 ) {
+        } else if (this.readCount === 1) {
           if (!res.data.enterd) {
             Alert.alert('エラー', '入室に失敗しました', [
-              {text: 'OK', onPress: () => {
-                this.setState({isQrReady: true});
+              {
+                text: 'OK', onPress: () => {
+                  this.setState({isQrReady: true});
                   this.props.navigation.navigate('Home', {
                     status: 'start',
                   });
-                }},
+                },
+              },
             ]);
           }
           this.props.navigation.navigate('Home', {
@@ -68,27 +69,54 @@ class GameEnter extends BaseScreen {
         }
 
       })
-      .catch(() => {
-        Alert.alert('エラー', '通信に失敗しました', [
-          {text: 'OK', onPress: () => this.setState({isQrReady: true})},
-        ]);
+      .catch((err) => {
+          if (err.response.status === 409) {
+            if (this.readCount === 0) {
+              this.readCount += 1;
+              Alert.alert('OK', '2枚目のカードを読み取ってください', [
+                {text: 'OK', onPress: () => this.setState({isQrReady: true})},
+              ]);
+            } else if (this.readCount === 1) {
+              if (!err.response.data.enterd) {
+                Alert.alert('エラー', '入室に失敗しました', [
+                  {
+                    text: 'OK', onPress: () => {
+                      this.setState({isQrReady: true});
+                      this.props.navigation.navigate('Home', {
+                        status: 'start',
+                      });
+                    },
+                  },
+                ]);
+              }
+              this.props.navigation.navigate('Home', {
+                status: 'start_waiting',
+              });
+            }
 
-        if (this.readCount === 1) {
-          Alert.alert('エラー', '通信に失敗しました', [
-            {
-              text: 'OK', onPress: () => {
-                this.setState({isQrReady: true});
-                this.props.navigation.navigate('Home', {
-                  status: 'start',
-                });
-              },
-            },
-          ]);
+            console.log(err);
+            Alert.alert('エラー', '通信に失敗しました', [
+              {text: 'OK', onPress: () => this.setState({isQrReady: true})},
+            ]);
 
-          return;
-        }
+            if (this.readCount === 1) {
+              Alert.alert('エラー', '通信に失敗しました', [
+                {
+                  text: 'OK', onPress: () => {
+                    this.setState({isQrReady: true});
+                    this.props.navigation.navigate('Home', {
+                      status: 'start',
+                    });
+                  },
+                },
+              ]);
 
-      });
+              return;
+            }
+
+          }
+        },
+      );
   };
 
   render() {

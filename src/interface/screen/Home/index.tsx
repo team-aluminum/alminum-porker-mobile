@@ -7,7 +7,6 @@ import React, { Fragment, ReactElement } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
-  Button,
   StatusBar,
   Text,
   Linking,
@@ -21,6 +20,7 @@ import UrlParse from 'url-parse';
 import { NavigationScreenProps } from "react-navigation";
 import { FlatButton } from '../../../util/ui/component/FlatButton';
 import GameApi from "../../../infrastructure/network/GameApi";
+import { WebView } from 'react-native-webview';
 
 class Home extends BaseScreen {
 
@@ -58,6 +58,7 @@ class Home extends BaseScreen {
   componentDidMount(): void {
     Linking.addEventListener('url', this.handleOpenURL);
     this.status = this.props.navigation.getParam('status', 'start');
+    setTimeout(() => this.getStatus(), 1000);
   }
 
   componentWillUnmount(): void {
@@ -80,12 +81,36 @@ class Home extends BaseScreen {
       hosting: !!url.query.hosting,
     });
 
+    if (this.state.hosting) {
+      this.status = 'read_card';
+      this.setState({
+        playStatus: 'waiting'
+      });
+      return;
+    }
+
     const api = new GameApi(this.state.userCode);
     api.sendMobileUser().catch(() => {
       Alert.alert('ゲームに参加', 'ユーザー情報の送信に失敗しました', [
         {text: 'OK'},
       ]);
     });
+  };
+
+  getStatus = () => {
+    if (this.status !== 'read_card') {
+      return;
+    }
+
+    const api = new GameApi(this.state.userCode);
+    api.getStatus()
+      .then((res) => {
+        console.log(res);
+        this.setState({playStatus: res.data.status});
+      })
+      .catch();
+
+    setTimeout(() => this.getStatus(), 1000);
   };
 
   render(): ReactElement {
@@ -122,6 +147,11 @@ class Home extends BaseScreen {
                 </View>
               </View> : null
             }
+
+            <WebView
+              source={{uri: 'https://google.com'}}
+              style={{marginTop: 20}}
+            />
 
           </SafeAreaView>
         </ImageBackground>
