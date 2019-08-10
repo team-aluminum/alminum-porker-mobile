@@ -20,7 +20,7 @@ export default class GameApi {
   }
 
   sendReadCard(card: string) {
-    return this.api.post('/mobile_events/mobile_user', {
+    return this.api.post('/mobile_events/read_card', {
       params: {
         user_code: this.userCode,
         card,

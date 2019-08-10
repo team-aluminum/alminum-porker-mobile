@@ -16,6 +16,8 @@ export default class APIClient {
   }
 
   post(url: string, options: IAPIRequestParams) {
+    console.log(url);
+    console.log(options);
     return axios.post(this.endpoint + url, options.params);
   }
 }
