@@ -28,6 +28,7 @@ class GameEnter extends BaseScreen {
       userCode: this.props.navigation.getParam('userCode', ''),
       hosting: false,
       isQrReady: true,
+      playStatus: '',
     };
   }
 
@@ -42,17 +43,30 @@ class GameEnter extends BaseScreen {
 
     const gameApi = new GameApi(this.state.userCode);
     gameApi.sendReadCard(readText)
-      .then(() => {
-        if (this.readCount === 1) {
+      .then((res) => {
+        if (this.readCount === 0) {
+          this.readCount += 1;
+          Alert.alert('OK', '2枚目のカードを読み取ってください', [
+            {text: 'OK', onPress: () => this.setState({isQrReady: true})},
+          ]);
+        }
+        else if (this.readCount === 1 ) {
+          if (!res.data.enterd) {
+            Alert.alert('エラー', '入室に失敗しました', [
+              {text: 'OK', onPress: () => {
+                this.setState({isQrReady: true});
+                  this.props.navigation.navigate('Home', {
+                    status: 'start',
+                  });
+                }},
+            ]);
+          }
           this.props.navigation.navigate('Home', {
             status: 'start_waiting',
           });
           return;
         }
-        this.readCount += 1;
-        Alert.alert('OK', '2枚目のカードを読み取ってください', [
-          {text: 'OK', onPress: () => this.setState({isQrReady: true})},
-        ]);
+
       })
       .catch(() => {
         Alert.alert('エラー', '通信に失敗しました', [

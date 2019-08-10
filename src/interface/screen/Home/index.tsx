@@ -30,6 +30,7 @@ class Home extends BaseScreen {
       userCode: '',
       hosting: false,
       isQrReady: false,
+      playStatus: '',
     };
   }
 
@@ -37,6 +38,13 @@ class Home extends BaseScreen {
   status = 'start';
 
   onPressGameEnter = (): void => {
+    if (!this.state.userCode) {
+      Alert.alert('JOIN GAME', 'カメラからQRリンクを起動してください', [
+        {text: 'OK'},
+      ]);
+      return;
+    }
+
     this.props.navigation.navigate('GameEnter', {
       userCode: this.state.userCode,
     });
@@ -70,7 +78,7 @@ class Home extends BaseScreen {
     this.setState({
       userCode: url.query.userCode,
       hosting: !!url.query.hosting,
-    })
+    });
 
     const api = new GameApi(this.state.userCode);
     api.sendMobileUser().catch(() => {
@@ -87,20 +95,34 @@ class Home extends BaseScreen {
         <ImageBackground source={require('../../../assets/images/background.png')} style={styles.ImageBackground}>
           <SafeAreaView style={styles.SafeAreaView}>
             <View style={styles.LogoView}>
-              <Image style={styles.LogoImage} source={require('../../../assets/images/logo.png')} />
+              <Image style={styles.LogoImage} source={require('../../../assets/images/logo.png')}/>
             </View>
             {this.status === 'start' ?
               <View style={styles.MenuView}>
-                <FlatButton text={'JOIN GAME'} onPress={this.onPressGameEnter} />
+                <FlatButton text={'JOIN GAME'} onPress={this.onPressGameEnter}/>
               </View>
               : null}
 
-            <Button title={'トランプを読み取る'} onPress={this.onPressCardScanner}/>
-
             {this.status === 'start_waiting' ? <Text>ゲームが開始されるまで{'\n'}お待ちください</Text> : null}
 
-            <Text>UserCode: {this.state.userCode ? this.state.userCode : '未設定'}</Text>
-            <Text>hosting: {this.state.hosting ? 'Yes' : 'No'}</Text>
+            {this.status === 'read_card' && this.state.playStatus === 'read_card' ?
+              <View>
+                <View style={styles.MenuView}>
+                  <Text>あなたの番です！{'\n'}カードを読み取ってください</Text>
+                  <FlatButton text={'READ CARD'} onPress={this.onPressCardScanner}/>
+                </View>
+              </View>
+              : null
+            }
+
+            {this.status === 'read_card' && this.state.playStatus === 'waiting' ?
+              <View>
+                <View style={styles.MenuView}>
+                  <Text>相手が操作するのを待っています</Text>
+                </View>
+              </View> : null
+            }
+
           </SafeAreaView>
         </ImageBackground>
       </Fragment>

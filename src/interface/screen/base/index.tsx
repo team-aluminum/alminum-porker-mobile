@@ -9,6 +9,7 @@ interface State {
   userCode: string,
   hosting: boolean,
   isQrReady: boolean,
+  playStatus: string,
 }
 
 class BaseScreen extends Component<BaseProps, State> {
